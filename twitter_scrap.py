@@ -17,6 +17,11 @@ import time
 import csv
 import dateutil.parser
 
+
+from sentence_transformers import SentenceTransformer
+from numpy import dot
+from numpy.linalg import norm
+
 def create_headers(bearer_token):
     headers = {"Authorization": "Bearer {}".format(bearer_token)}
     return headers
@@ -163,4 +168,25 @@ def retrive_many(bearer_token,timelines,tweets_per_timeline,mr,start_time,delta,
             flag = False
             next_token = None
         time.sleep(5)
+
+"""**TEXT SIMILARITY**"""
+
+def sort_tuples(tuple_list):
+  sorted_result=sorted(tuple_list, key=lambda x: x[1],reverse=True)
+  return sorted_result
+
+def similarity(query,corpus):
+  model = SentenceTransformer('sentence-transformers/all-distilroberta-v1')
+  results=[]
+  for tweet in tqdm(corpus):
+    couple=(query,tweet)
+    embeddings = model.encode(couple)
+    cos_sim = dot(embeddings[0], embeddings[1])/(norm(embeddings[0])*norm(embeddings[1]))
+    results.append((tweet,cos_sim))
+  return sort_tuples(results)
+
+#query="Defending world champions end Morocco’s World Cup dreams and book their place in the final. France have beaten Morocco 2-0 at Al Bayt Stadium to claim a place in Sunday’s World Cup final."
+#results=similarity(query,df['Text'].tolist())
+
+#x=list(filter(lambda x: x[1] >= 0.5, results))
 
