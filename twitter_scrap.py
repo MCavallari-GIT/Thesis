@@ -110,9 +110,6 @@ def retrive(bearer_token,timelines,filename="data.csv",mr=10):
     json_response = connect_to_endpoint(url[0], headers, url[1])
     append_to_csv(json_response, filename)
     time.sleep(2)
-  
-  #df = pd.read_csv(filename,header=None)
-  #df.rename(columns={'0': 'Custom field (Verified Date)'}, inplace=True)
 
 def retrive_many(bearer_token,timelines,tweets_per_timeline,mr,start_time,delta,filename="data.csv",limit_fixed=False):#max result per timeline
   total_tweets = 0
@@ -120,7 +117,7 @@ def retrive_many(bearer_token,timelines,tweets_per_timeline,mr,start_time,delta,
   # Create file
   csvFile = open(filename, "a", newline="", encoding='utf-8')
   csvWriter = csv.writer(csvFile)
-  #Create headers for the data you want to save, in this example, we only want save these columns in our dataset
+  #Create headers for the data you want to save.
   csvWriter.writerow(["authorID","created_at","TweetID","Text"])
   csvFile.close()
 
@@ -146,7 +143,7 @@ def retrive_many(bearer_token,timelines,tweets_per_timeline,mr,start_time,delta,
             print("Next Token: ", next_token)       
         # If no next token exists
         else:
-          #Since this is the final request, turn flag to false to move to the next time period.
+          #Since this is the final request, turn flag to false to move to the next timeline.
           flag = False
           next_token = None
         if result_count is not None and result_count > 0:
@@ -174,9 +171,4 @@ def similarity(query,corpus):
     cos_sim = dot(embeddings[0], embeddings[1])/(norm(embeddings[0])*norm(embeddings[1]))
     results.append((tweet,cos_sim))
   return sort_tuples(results)
-
-#query="Defending world champions end Morocco’s World Cup dreams and book their place in the final. France have beaten Morocco 2-0 at Al Bayt Stadium to claim a place in Sunday’s World Cup final."
-#results=similarity(query,df['Text'].tolist())
-
-#x=list(filter(lambda x: x[1] >= 0.5, results))
 
