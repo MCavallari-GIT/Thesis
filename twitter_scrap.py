@@ -143,30 +143,20 @@ def retrive_many(bearer_token,timelines,tweets_per_timeline,mr,start_time,delta,
         if 'next_token' in json_response['meta']:
             # Save the token to use for next call
             next_token = json_response['meta']['next_token']
-            print("Next Token: ", next_token)
-            if result_count is not None and result_count > 0 and next_token is not None:
-                print("Start Date: ", start_time)
-                append_to_csv(json_response, filename)
-                count += result_count
-                total_tweets += result_count
-                print("Total # of Tweets added: ", total_tweets)
-                print("-------------------")
-                time.sleep(5)                
+            print("Next Token: ", next_token)       
         # If no next token exists
         else:
-            if result_count is not None and result_count > 0:
-                print("-------------------")
-                print("Start Date: ", start_time)
-                append_to_csv(json_response, filename)
-                count += result_count
-                total_tweets += result_count
-                print("Total # of Tweets added: ", total_tweets)
-                print("-------------------")
-                time.sleep(5)
-            
-            #Since this is the final request, turn flag to false to move to the next time period.
-            flag = False
-            next_token = None
+          #Since this is the final request, turn flag to false to move to the next time period.
+          flag = False
+          next_token = None
+        if result_count is not None and result_count > 0:
+          print("-------------------")
+          append_to_csv(json_response, filename)
+          count += result_count
+          total_tweets += result_count
+          print("Total # of Tweets added: ", total_tweets)
+          print("-------------------")
+          time.sleep(5)
         time.sleep(5)
 
 """**TEXT SIMILARITY**"""
