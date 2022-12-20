@@ -90,28 +90,7 @@ def connect_to_endpoint(url, headers, params, next_token = None):
         raise Exception(response.status_code, response.text)
     return response.json()
 
-def read_csv(filename):
-  data = pd.read_csv(filename,header=0)
-  return data
-
-def retrive(bearer_token,timelines,filename="data.csv",mr=10):
-  # Create file
-  csvFile = open(filename, "a", newline="", encoding='utf-8')
-  csvWriter = csv.writer(csvFile)
-  
-  #Create headers for the data you want to save, in this example, we only want save these columns in our dataset
-  csvWriter.writerow(["authorID","created_at","TweetID","Text"])
-  csvFile.close()
-
-  for timeline in timelines:
-    print(timeline)
-    headers=create_headers(bearer_token)
-    url=create_url(timeline, start_time, hour_delta=delta, max_results = mr)
-    json_response = connect_to_endpoint(url[0], headers, url[1])
-    append_to_csv(json_response, filename)
-    time.sleep(2)
-
-def retrive_many(bearer_token,timelines,tweets_per_timeline,mr,start_time,delta,filename="data.csv",limit_fixed=False):#max result per timeline
+def retrive_tweets(bearer_token,timelines,mr,start_time,delta,filename="data.csv"):#max result per timeline
   total_tweets = 0
   headers=create_headers(bearer_token)
   # Create file
@@ -127,10 +106,6 @@ def retrive_many(bearer_token,timelines,tweets_per_timeline,mr,start_time,delta,
     next_token = None
     flag=True
     while flag:
-        # Check if max_count reached
-        if limit_fixed==True:
-          if count >= tweets_per_timeline:
-              break
         print("-------------------")
         print("Token: ", next_token)
         url=create_url(timeline, start_time, hour_delta=delta, max_results = mr)
@@ -156,11 +131,9 @@ def retrive_many(bearer_token,timelines,tweets_per_timeline,mr,start_time,delta,
           time.sleep(5)
         time.sleep(5)
 
-"""**TEXT SIMILARITY**"""
 
-def sort_tuples(tuple_list):
-  sorted_result=sorted(tuple_list, key=lambda x: x[1],reverse=True)
-  return sorted_result
+
+"""**TEXT SIMILARITY**"""
 
 def similarity(query,corpus):
   model = SentenceTransformer('sentence-transformers/all-distilroberta-v1')
@@ -170,5 +143,5 @@ def similarity(query,corpus):
     embeddings = model.encode(couple)
     cos_sim = dot(embeddings[0], embeddings[1])/(norm(embeddings[0])*norm(embeddings[1]))
     results.append((tweet,cos_sim))
-  return sort_tuples(results)
+  return sorted(results, key=lambda x: x[1],reverse=True)
 
